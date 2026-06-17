@@ -1,0 +1,26 @@
+{
+  "name": "maoxtrem/asistentecamvasia",
+  "description": "Bundle Symfony para orquestar generacion de canvas con un microservicio de IA.",
+  "type": "symfony-bundle",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.1",
+    "symfony/config": "^6.4|^7.0",
+    "symfony/dependency-injection": "^6.4|^7.0",
+    "symfony/http-client": "^6.4|^7.0",
+    "symfony/http-foundation": "^6.4|^7.0",
+    "symfony/http-kernel": "^6.4|^7.0",
+    "symfony/routing": "^6.4|^7.0",
+    "twig/twig": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Maoxtrem\\AsistenteCamvasia\\": "src/"
+    }
+  },
+  "extra": {
+    "symfony": {
+      "bundle": "Maoxtrem\\AsistenteCamvasia\\AsistenteCamvasiaBundle"
+    }
+  }
+}

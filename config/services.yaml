@@ -1,0 +1,29 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  Maoxtrem\AsistenteCamvasia\:
+    resource: '../src/'
+    exclude:
+      - '../src/DependencyInjection/'
+      - '../src/DTO/'
+
+  Maoxtrem\AsistenteCamvasia\Controller\:
+    resource: '../src/Controller/'
+    tags: ['controller.service_arguments']
+
+  Maoxtrem\AsistenteCamvasia\Controller\Api\CanvasGenerationController:
+    arguments:
+      $tenantName: '%asistentecamvasia.tenant_name%'
+
+  Maoxtrem\AsistenteCamvasia\Service\ExternalCanvasAssistantClient:
+    arguments:
+      $baseUrl: '%asistentecamvasia.base_url%'
+      $generationEndpoint: '%asistentecamvasia.generation_endpoint%'
+      $apiKey: '%asistentecamvasia.api_key%'
+      $connectTimeout: '%asistentecamvasia.connect_timeout%'
+      $timeout: '%asistentecamvasia.timeout%'
+      $verifyPeer: '%asistentecamvasia.verify_peer%'
+      $verifyHost: '%asistentecamvasia.verify_host%'
+      $defaultHeaders: '%asistentecamvasia.default_headers%'
