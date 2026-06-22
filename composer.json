@@ -1,6 +1,6 @@
 {
-  "name": "maoxtrem/asistentecamvasia",
-  "description": "Bundle Symfony para orquestar generacion de canvas con un microservicio de IA.",
+  "name": "maoxtrem/asistente-camvas-ia",
+  "description": "Bundle Symfony para una burbuja de asistente de canvas conectada a un microservicio de IA.",
   "type": "symfony-bundle",
   "license": "proprietary",
   "require": {

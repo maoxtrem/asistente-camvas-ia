@@ -1,0 +1,59 @@
+<div
+    id="asistentecamvasia-widget"
+    class="asistentecamvasia-widget"
+    data-widget-title="{{ widgetTitle|e('html_attr') }}"
+    data-widget-label="{{ widgetLabel|e('html_attr') }}"
+    data-widget-message="{{ widgetMessage|e('html_attr') }}"
+    data-widget-help="{{ widgetHelpText|e('html_attr') }}"
+    data-widget-status="{{ connection.ok ? 'connected' : 'offline' }}"
+    data-widget-status-message="{{ connection.message|e('html_attr') }}"
+    data-tenant="{{ tenantName|e('html_attr') }}"
+>
+    <section id="asistentecamvasia-panel" class="asistentecamvasia-panel" aria-hidden="true">
+        <header class="asistentecamvasia-panel__header">
+            <strong>{{ widgetTitle }}</strong>
+            <button id="asistentecamvasia-close" type="button" class="asistentecamvasia-panel__close" aria-label="Cerrar">×</button>
+        </header>
+
+        <div class="asistentecamvasia-panel__body">
+            <div class="asistentecamvasia-status asistentecamvasia-status--{{ connection.ok ? 'ok' : 'error' }}">
+                <span class="asistentecamvasia-status__badge">
+                    {{ connection.ok ? 'Conectado' : 'Sin conexión' }}
+                </span>
+                <p class="asistentecamvasia-status__message">{{ widgetMessage }}</p>
+                <p class="asistentecamvasia-status__help">{{ widgetHelpText }}</p>
+                <small class="asistentecamvasia-status__detail">{{ connection.message }}</small>
+            </div>
+
+            <div id="asistentecamvasia-chat" class="asistentecamvasia-chat">
+                <div id="asistentecamvasia-messages" class="asistentecamvasia-chat__messages" aria-live="polite" aria-label="Historial del chat"></div>
+
+                <form
+                    id="asistentecamvasia-form"
+                    class="asistentecamvasia-chat__composer"
+                    data-generate-endpoint="{{ path('asistentecamvasia_canvas_generate') }}"
+                >
+                    <label for="asistentecamvasia-message" class="asistentecamvasia-chat__label">
+                        Escribe un mensaje
+                    </label>
+                    <textarea
+                        id="asistentecamvasia-message"
+                        class="asistentecamvasia-chat__input"
+                        rows="3"
+                        placeholder="Escribe tu mensaje y envíalo al canvas"
+                    >Prueba de conexión desde la burbuja de Canvas IA.</textarea>
+
+                    <div class="asistentecamvasia-chat__actions">
+                        <button id="asistentecamvasia-send" type="submit" class="asistentecamvasia-chat__send">
+                            Enviar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+<link rel="stylesheet" href="{{ asset('bundles/asistentecamvasia/css/asistente-camvasia-widget.css') }}">
+<script defer src="{{ asset('bundles/asistentecamvasia/js/asistente-camvas-ia.js') }}"></script>
+<script defer src="{{ asset('bundles/asistentecamvasia/js/asistente-camvasia-widget.js') }}"></script>

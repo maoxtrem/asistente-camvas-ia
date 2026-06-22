@@ -25,14 +25,18 @@ final class AsistenteCamvasiaExtension extends Extension
         $container->setParameter('asistentecamvasia.timeout', $config['timeout']);
         $container->setParameter('asistentecamvasia.verify_peer', $config['verify_peer']);
         $container->setParameter('asistentecamvasia.verify_host', $config['verify_host']);
+        $container->setParameter('asistentecamvasia.widget_title', $config['widget_title']);
+        $container->setParameter('asistentecamvasia.widget_label', $config['widget_label']);
+        $container->setParameter('asistentecamvasia.widget_message', $config['widget_message']);
+        $container->setParameter('asistentecamvasia.widget_help_text', $config['widget_help_text']);
         $container->setParameter('asistentecamvasia.default_headers', $config['default_headers']);
 
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('services.yaml');
     }
 
     public function getAlias(): string
     {
-        return 'asistentecamvasia';
+        return 'asistente_camvasia';
     }
 }

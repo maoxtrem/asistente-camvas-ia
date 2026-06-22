@@ -21,9 +21,18 @@ services:
     arguments:
       $baseUrl: '%asistentecamvasia.base_url%'
       $generationEndpoint: '%asistentecamvasia.generation_endpoint%'
+      $healthEndpoint: '%asistentecamvasia.health_endpoint%'
       $apiKey: '%asistentecamvasia.api_key%'
       $connectTimeout: '%asistentecamvasia.connect_timeout%'
       $timeout: '%asistentecamvasia.timeout%'
       $verifyPeer: '%asistentecamvasia.verify_peer%'
       $verifyHost: '%asistentecamvasia.verify_host%'
       $defaultHeaders: '%asistentecamvasia.default_headers%'
+
+  Maoxtrem\AsistenteCamvasia\Controller\WidgetController:
+    arguments:
+      $tenantName: '%asistentecamvasia.tenant_name%'
+      $widgetTitle: '%asistentecamvasia.widget_title%'
+      $widgetLabel: '%asistentecamvasia.widget_label%'
+      $widgetMessage: '%asistentecamvasia.widget_message%'
+      $widgetHelpText: '%asistentecamvasia.widget_help_text%'

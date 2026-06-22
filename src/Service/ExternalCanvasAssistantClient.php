@@ -15,6 +15,7 @@ final class ExternalCanvasAssistantClient
         private readonly HttpClientInterface $httpClient,
         private readonly string $baseUrl,
         private readonly string $generationEndpoint,
+        private readonly string $healthEndpoint,
         private readonly string $apiKey,
         private readonly float $connectTimeout,
         private readonly float $timeout,
@@ -61,9 +62,48 @@ final class ExternalCanvasAssistantClient
         );
     }
 
+    /**
+     * @return array{ok:bool, message:string, status_code:?int, raw:array<string, mixed>}
+     */
+    public function health(): array
+    {
+        try {
+            $response = $this->httpClient->request('GET', $this->buildHealthUrl(), [
+                'headers' => $this->buildHeaders(),
+                'max_connect_duration' => $this->connectTimeout,
+                'timeout' => min($this->timeout, 10.0),
+                'verify_peer' => $this->verifyPeer,
+                'verify_host' => $this->verifyHost,
+            ]);
+
+            $payload = $response->toArray(false);
+            $statusCode = $response->getStatusCode();
+            $message = trim((string) ($payload['message'] ?? $payload['status'] ?? ''));
+
+            return [
+                'ok' => $statusCode >= 200 && $statusCode < 300,
+                'message' => $message !== '' ? $message : 'Conexión disponible con el microservicio.',
+                'status_code' => $statusCode,
+                'raw' => is_array($payload) ? $payload : [],
+            ];
+        } catch (Throwable $exception) {
+            return [
+                'ok' => false,
+                'message' => 'No fue posible conectar con el microservicio de canvas IA.',
+                'status_code' => null,
+                'raw' => ['error' => $exception->getMessage()],
+            ];
+        }
+    }
+
     private function buildUrl(): string
     {
         return rtrim($this->baseUrl, '/') . '/' . ltrim($this->generationEndpoint, '/');
+    }
+
+    private function buildHealthUrl(): string
+    {
+        return rtrim($this->baseUrl, '/') . '/' . ltrim($this->healthEndpoint, '/');
     }
 
     /**
