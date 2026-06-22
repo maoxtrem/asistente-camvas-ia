@@ -363,7 +363,7 @@
         return {
             message,
             tenant: document.getElementById('asistentecamvasia-widget')?.dataset.tenant || 'marketing',
-            locale: 'es',
+            locale: document.getElementById('asistentecamvasia-widget')?.dataset.widgetLocale || document.documentElement.lang || 'es',
             mode: 'generate',
             canvas: snapshot.canvas,
             elements: snapshot.elements,

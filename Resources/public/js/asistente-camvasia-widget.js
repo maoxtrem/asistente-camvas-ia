@@ -21,6 +21,26 @@
     }
 
     const conversationHistory = [];
+    const ui = {
+        locale: widget.dataset.widgetLocale || 'es',
+        closeLabel: widget.dataset.uiCloseLabel || 'Cerrar',
+        statusConnected: widget.dataset.uiStatusConnected || 'Conectado',
+        statusOffline: widget.dataset.uiStatusOffline || 'Sin conexión',
+        composerLabel: widget.dataset.uiComposerLabel || 'Escribe un mensaje',
+        placeholder: widget.dataset.uiPlaceholder || 'Escribe tu mensaje y envíalo al canvas',
+        sendLabel: widget.dataset.uiSendLabel || 'Enviar',
+        sendingLabel: widget.dataset.uiSendingLabel || 'Enviando…',
+        userLabel: widget.dataset.uiUserLabel || 'Tú',
+        assistantLabel: widget.dataset.uiAssistantLabel || 'Canvas IA',
+        welcome: widget.dataset.uiWelcome || 'Asistente de canvas listo.',
+        help: widget.dataset.uiHelp || '',
+        disconnected: widget.dataset.uiDisconnected || 'No hay conexión con el microservicio.',
+        noEndpoint: widget.dataset.uiNoEndpoint || 'No se encontró el endpoint de generación.',
+        responseReceived: widget.dataset.uiResponseReceived || 'Respuesta recibida.',
+        designApplied: widget.dataset.uiDesignApplied || 'Diseño aplicado al lienzo.',
+        typing: widget.dataset.uiTyping || 'Escribiendo…',
+        defaultMessage: widget.dataset.uiDefaultMessage || 'Prueba de conexión desde la burbuja de Canvas IA.',
+    };
 
     const setOpen = (isOpen) => {
         panel.classList.toggle('is-open', isOpen);
@@ -91,7 +111,7 @@
 
         const meta = document.createElement('div');
         meta.className = 'asistentecamvasia-chat__meta';
-        meta.textContent = role === 'user' ? 'Tú' : 'Canvas IA';
+        meta.textContent = role === 'user' ? ui.userLabel : ui.assistantLabel;
 
         const bubble = document.createElement('div');
         bubble.className = 'asistentecamvasia-chat__bubble';
@@ -652,7 +672,7 @@
         }
 
         sendButton.disabled = isTyping;
-        sendButton.textContent = isTyping ? 'Enviando…' : 'Enviar';
+        sendButton.textContent = isTyping ? ui.sendingLabel : ui.sendLabel;
     };
 
     const buildTestPayload = (message) => {
@@ -663,7 +683,7 @@
         return {
             message,
             tenant: widget.dataset.tenant || 'marketing',
-            locale: 'es',
+            locale: ui.locale,
             mode: 'generate',
             canvas: {
                 source: 'widget',
@@ -753,10 +773,10 @@
         }
 
         const endpoint = form.dataset.generateEndpoint;
-        const message = String(messageInput.value || '').trim() || 'Prueba de conexión desde la burbuja de Canvas IA.';
+        const message = String(messageInput.value || '').trim() || ui.defaultMessage;
 
         if (!endpoint) {
-            addMessage('assistant', 'No se encontró el endpoint de generación.');
+            addMessage('assistant', ui.noEndpoint);
             return;
         }
 
@@ -765,7 +785,7 @@
         messageInput.value = '';
         setTypingState(true);
 
-        const pending = addMessage('assistant', 'Escribiendo…', { isPending: true });
+        const pending = addMessage('assistant', ui.typing, { isPending: true });
         const requestPayload = buildTestPayload(message);
 
         try {
@@ -780,7 +800,7 @@
 
             const payload = await response.json().catch(() => null);
             const assistantText = response.ok
-                ? extractAssistantText(payload) || 'Respuesta recibida.'
+                ? extractAssistantText(payload) || ui.responseReceived
                 : normalizeText(payload, `Error HTTP ${response.status}`);
 
             if (pending) {
@@ -797,8 +817,8 @@
                 if (validation.valid) {
                     const applied = applyDesignToCanvas(validation.design);
                     if (applied) {
-                        addMessage('assistant', 'Diseño aplicado al lienzo.');
-                        conversationHistory.push({ role: 'assistant', content: 'Diseño aplicado al lienzo.' });
+                        addMessage('assistant', ui.designApplied);
+                        conversationHistory.push({ role: 'assistant', content: ui.designApplied });
                     }
                 } else {
                     addMessage('assistant', validation.reason);
@@ -820,8 +840,8 @@
     };
 
     const seedConversation = () => {
-        const welcome = widget.dataset.widgetMessage || 'Bienvenido al canvas.';
-        const help = widget.dataset.widgetHelp || '';
+        const welcome = widget.dataset.widgetMessage || ui.welcome;
+        const help = widget.dataset.widgetHelp || ui.help;
         const connected = widget.dataset.widgetStatus === 'connected';
 
         addMessage('assistant', welcome);
@@ -829,7 +849,7 @@
             addMessage('assistant', help);
         }
         if (!connected) {
-            addMessage('assistant', widget.dataset.widgetStatusMessage || 'No hay conexión con el microservicio.');
+            addMessage('assistant', widget.dataset.widgetStatusMessage || ui.disconnected);
         }
     };
 
@@ -843,6 +863,15 @@
     });
 
     form?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        void sendTestMessage();
+    });
+
+    messageInput?.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' || event.shiftKey) {
+            return;
+        }
+
         event.preventDefault();
         void sendTestMessage();
     });

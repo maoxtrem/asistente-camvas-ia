@@ -6,6 +6,7 @@ namespace Maoxtrem\AsistenteCamvasia\Controller\Api;
 
 use Maoxtrem\AsistenteCamvasia\DTO\CanvasGenerationRequest;
 use Maoxtrem\AsistenteCamvasia\Service\ExternalCanvasAssistantClient;
+use Maoxtrem\AsistenteCamvasia\Support\LocaleCopy;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,6 +16,7 @@ final class CanvasGenerationController
     public function __construct(
         private readonly ExternalCanvasAssistantClient $canvasAssistantClient,
         private readonly string $tenantName,
+        private readonly string $locale,
     ) {
     }
 
@@ -28,7 +30,7 @@ final class CanvasGenerationController
                 'ok' => false,
                 'error' => [
                     'code' => 'invalid_json',
-                    'message' => 'El cuerpo debe ser JSON valido.',
+                    'message' => LocaleCopy::widget($this->locale)['invalid_json'],
                 ],
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
@@ -41,7 +43,7 @@ final class CanvasGenerationController
                 'ok' => false,
                 'error' => [
                     'code' => 'message_required',
-                    'message' => 'El campo message es obligatorio.',
+                    'message' => LocaleCopy::widget($this->locale)['message_required'],
                 ],
             ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }

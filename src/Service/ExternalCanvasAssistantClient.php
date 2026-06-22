@@ -6,6 +6,7 @@ namespace Maoxtrem\AsistenteCamvasia\Service;
 
 use Maoxtrem\AsistenteCamvasia\DTO\CanvasGenerationRequest;
 use Maoxtrem\AsistenteCamvasia\DTO\CanvasGenerationResponse;
+use Maoxtrem\AsistenteCamvasia\Support\LocaleCopy;
 use Throwable;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -22,6 +23,7 @@ final class ExternalCanvasAssistantClient
         private readonly bool $verifyPeer,
         private readonly bool $verifyHost,
         private readonly array $defaultHeaders = [],
+        private readonly string $locale = 'es',
     ) {
     }
 
@@ -39,9 +41,11 @@ final class ExternalCanvasAssistantClient
 
             $payload = $response->toArray(false);
         } catch (Throwable $exception) {
+            $copy = LocaleCopy::service($this->locale);
+
             return new CanvasGenerationResponse(
                 ok: false,
-                message: 'No fue posible conectar con el microservicio de canvas IA.',
+                message: $copy['connection_failed'],
                 design: null,
                 actions: [],
                 raw: ['error' => $exception->getMessage()],
@@ -55,7 +59,7 @@ final class ExternalCanvasAssistantClient
 
         return new CanvasGenerationResponse(
             ok: true,
-            message: $message !== '' ? $message : 'El microservicio no devolvio una respuesta util.',
+            message: $message !== '' ? $message : LocaleCopy::service($this->locale)['generation_unavailable'],
             design: $design,
             actions: $actions,
             raw: is_array($payload) ? $payload : [],
@@ -87,9 +91,11 @@ final class ExternalCanvasAssistantClient
                 'raw' => is_array($payload) ? $payload : [],
             ];
         } catch (Throwable $exception) {
+            $copy = LocaleCopy::service($this->locale);
+
             return [
                 'ok' => false,
-                'message' => 'No fue posible conectar con el microservicio de canvas IA.',
+                'message' => $copy['connection_failed'],
                 'status_code' => null,
                 'raw' => ['error' => $exception->getMessage()],
             ];

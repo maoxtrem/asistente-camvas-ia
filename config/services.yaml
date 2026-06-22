@@ -16,6 +16,7 @@ services:
   Maoxtrem\AsistenteCamvasia\Controller\Api\CanvasGenerationController:
     arguments:
       $tenantName: '%asistentecamvasia.tenant_name%'
+      $locale: '%asistentecamvasia.locale%'
 
   Maoxtrem\AsistenteCamvasia\Service\ExternalCanvasAssistantClient:
     arguments:
@@ -28,10 +29,12 @@ services:
       $verifyPeer: '%asistentecamvasia.verify_peer%'
       $verifyHost: '%asistentecamvasia.verify_host%'
       $defaultHeaders: '%asistentecamvasia.default_headers%'
+      $locale: '%asistentecamvasia.locale%'
 
   Maoxtrem\AsistenteCamvasia\Controller\WidgetController:
     arguments:
       $tenantName: '%asistentecamvasia.tenant_name%'
+      $locale: '%asistentecamvasia.locale%'
       $widgetTitle: '%asistentecamvasia.widget_title%'
       $widgetLabel: '%asistentecamvasia.widget_label%'
       $widgetMessage: '%asistentecamvasia.widget_message%'

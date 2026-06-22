@@ -24,9 +24,12 @@ asistentecamvasia:
   generation_endpoint: '/api/v1/asistentecamvasia/canvas/generate'
   health_endpoint: '/api/health'
   tenant_name: 'marketing'
+  locale: 'es'
   api_key: '%env(ASISTENTECAMVASIA_API_KEY)%'
   widget_title: 'Asistente Canvas IA'
   widget_label: 'Canvas IA'
   widget_message: 'Ya hay conexión al microservicio de canvas.'
   widget_help_text: 'Listo para preparar el lienzo cuando lo necesites.'
 ```
+
+Si no defines `widget_title`, `widget_label`, `widget_message` o `widget_help_text`, el bundle usa los textos por defecto del `locale` configurado.

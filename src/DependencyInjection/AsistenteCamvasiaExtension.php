@@ -20,6 +20,7 @@ final class AsistenteCamvasiaExtension extends Extension
         $container->setParameter('asistentecamvasia.generation_endpoint', $config['generation_endpoint']);
         $container->setParameter('asistentecamvasia.health_endpoint', $config['health_endpoint']);
         $container->setParameter('asistentecamvasia.tenant_name', $config['tenant_name']);
+        $container->setParameter('asistentecamvasia.locale', $config['locale']);
         $container->setParameter('asistentecamvasia.api_key', $config['api_key']);
         $container->setParameter('asistentecamvasia.connect_timeout', $config['connect_timeout']);
         $container->setParameter('asistentecamvasia.timeout', $config['timeout']);
