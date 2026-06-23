@@ -19,6 +19,7 @@ final class LocaleCopy
             'widget_label' => 'Canvas AI',
             'widget_message' => 'Connection is ready with the canvas microservice.',
             'widget_help_text' => 'Ready to prepare the canvas when you need it.',
+            'chat_history_label' => 'Chat history',
             'close_label' => 'Close',
             'status_connected' => 'Connected',
             'status_offline' => 'Offline',
@@ -36,6 +37,7 @@ final class LocaleCopy
             'design_applied' => 'Design applied to the canvas.',
             'typing' => 'Writing…',
             'default_message' => 'Connection test from the Canvas AI bubble.',
+            'send_failed' => 'Could not send the test',
             'invalid_json' => 'The body must be valid JSON.',
             'message_required' => 'The message field is required.',
         ] : [
@@ -43,6 +45,7 @@ final class LocaleCopy
             'widget_label' => 'Canvas IA',
             'widget_message' => 'Ya hay conexión al microservicio de canvas.',
             'widget_help_text' => 'Listo para preparar el lienzo cuando lo necesites.',
+            'chat_history_label' => 'Historial del chat',
             'close_label' => 'Cerrar',
             'status_connected' => 'Conectado',
             'status_offline' => 'Sin conexión',
@@ -60,6 +63,7 @@ final class LocaleCopy
             'design_applied' => 'Diseño aplicado al lienzo.',
             'typing' => 'Escribiendo…',
             'default_message' => 'Prueba de conexión desde la burbuja de Canvas IA.',
+            'send_failed' => 'No fue posible enviar la prueba',
             'invalid_json' => 'El cuerpo debe ser JSON valido.',
             'message_required' => 'El campo message es obligatorio.',
         ];
@@ -76,9 +80,11 @@ final class LocaleCopy
         return $isEnglish ? [
             'connection_failed' => 'Could not connect to the Canvas AI microservice.',
             'generation_unavailable' => 'The microservice did not return a useful response.',
+            'connection_available' => 'Connection available with the microservice.',
         ] : [
             'connection_failed' => 'No fue posible conectar con el microservicio de canvas IA.',
             'generation_unavailable' => 'El microservicio no devolvio una respuesta util.',
+            'connection_available' => 'Conexión disponible con el microservicio.',
         ];
     }
 

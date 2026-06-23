@@ -37,5 +37,3 @@ services:
       $locale: '%asistentecamvasia.locale%'
       $widgetTitle: '%asistentecamvasia.widget_title%'
       $widgetLabel: '%asistentecamvasia.widget_label%'
-      $widgetMessage: '%asistentecamvasia.widget_message%'
-      $widgetHelpText: '%asistentecamvasia.widget_help_text%'

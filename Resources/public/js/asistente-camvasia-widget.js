@@ -24,22 +24,17 @@
     const ui = {
         locale: widget.dataset.widgetLocale || 'es',
         closeLabel: widget.dataset.uiCloseLabel || 'Cerrar',
-        statusConnected: widget.dataset.uiStatusConnected || 'Conectado',
-        statusOffline: widget.dataset.uiStatusOffline || 'Sin conexión',
         composerLabel: widget.dataset.uiComposerLabel || 'Escribe un mensaje',
         placeholder: widget.dataset.uiPlaceholder || 'Escribe tu mensaje y envíalo al canvas',
         sendLabel: widget.dataset.uiSendLabel || 'Enviar',
         sendingLabel: widget.dataset.uiSendingLabel || 'Enviando…',
+        processingLabel: widget.dataset.uiProcessingLabel || 'Procesando la respuesta…',
         userLabel: widget.dataset.uiUserLabel || 'Tú',
         assistantLabel: widget.dataset.uiAssistantLabel || 'Canvas IA',
-        welcome: widget.dataset.uiWelcome || 'Asistente de canvas listo.',
-        help: widget.dataset.uiHelp || '',
-        disconnected: widget.dataset.uiDisconnected || 'No hay conexión con el microservicio.',
         noEndpoint: widget.dataset.uiNoEndpoint || 'No se encontró el endpoint de generación.',
         responseReceived: widget.dataset.uiResponseReceived || 'Respuesta recibida.',
         designApplied: widget.dataset.uiDesignApplied || 'Diseño aplicado al lienzo.',
-        typing: widget.dataset.uiTyping || 'Escribiendo…',
-        defaultMessage: widget.dataset.uiDefaultMessage || 'Prueba de conexión desde la burbuja de Canvas IA.',
+        sendFailed: widget.dataset.uiSendFailed || 'No fue posible enviar la prueba',
     };
 
     const setOpen = (isOpen) => {
@@ -96,6 +91,25 @@
         if (messagesBox) {
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
+    };
+
+    let pendingAssistantMessage = null;
+
+    const showPendingState = () => {
+        if (pendingAssistantMessage || !messagesBox) {
+            return;
+        }
+
+        pendingAssistantMessage = addMessage('assistant', ui.processingLabel, { isPending: true });
+    };
+
+    const clearPendingState = () => {
+        if (!pendingAssistantMessage) {
+            return;
+        }
+
+        pendingAssistantMessage.remove();
+        pendingAssistantMessage = null;
     };
 
     const addMessage = (role, content, options = {}) => {
@@ -265,6 +279,18 @@
         }
 
         area.querySelectorAll('.draggable-item').forEach((element) => element.remove());
+    };
+
+    const parseCanvasSize = (value) => {
+        const match = String(value || '').trim().match(/^(\d+)\s*x\s*(\d+)$/i);
+        if (!match) {
+            return null;
+        }
+
+        return {
+            width: Number(match[1]),
+            height: Number(match[2]),
+        };
     };
 
     const applyCanvasSize = (canvasData = {}) => {
@@ -548,26 +574,58 @@
             return false;
         }
 
+        area.style.backgroundImage = '';
+        area.style.backgroundColor = '';
+        area.style.backgroundRepeat = '';
+        area.style.backgroundPosition = '';
+        area.style.backgroundSize = '';
+
         if (design.canvas && typeof design.canvas === 'object') {
             applyCanvasSize(design.canvas);
+        } else if (design.canvasSize) {
+            const parsedSize = parseCanvasSize(design.canvasSize);
+            if (parsedSize) {
+                applyCanvasSize(parsedSize);
+            }
         }
 
         clearCanvas();
 
-        if (Array.isArray(design.elements)) {
-            design.elements.map(normalizeElementSchema).forEach((item) => {
+        const elements = Array.isArray(design.designElements)
+            ? design.designElements
+            : (Array.isArray(design.elements) ? design.elements : []);
+
+        if (Array.isArray(elements)) {
+            elements.map(normalizeElementSchema).forEach((item) => {
                 const element = buildElementNode(item);
                 area.appendChild(element);
             });
         }
 
-        if (design.canvas?.backgroundType === 'image' && design.canvas?.backgroundImage) {
-            area.style.backgroundImage = `url("${design.canvas.backgroundImage}")`;
+        const backgroundType = design.backgroundType || design.canvas?.backgroundType || null;
+        const backgroundImage = design.backgroundImage || design.canvas?.backgroundImage || null;
+        const primaryColor = design.primaryColor || design.canvas?.colors?.primary || null;
+        const secondaryColor = design.secondaryColor || design.canvas?.colors?.secondary || null;
+        const canvasSize = design.canvasSize || null;
+
+        if (primaryColor || secondaryColor) {
+            const colorPrimario = document.getElementById('colorPrimario');
+            const colorSecundario = document.getElementById('colorSecundario');
+            if (primaryColor && colorPrimario) {
+                colorPrimario.value = primaryColor;
+            }
+            if (secondaryColor && colorSecundario) {
+                colorSecundario.value = secondaryColor;
+            }
+        }
+
+        if (backgroundType === 'image' && backgroundImage) {
+            area.style.backgroundImage = `url("${backgroundImage}")`;
             area.style.backgroundSize = 'cover';
             area.style.backgroundPosition = 'center';
-        } else if (design.canvas?.colors?.primary || design.canvas?.colors?.secondary) {
-            const first = design.canvas.colors.primary || '#0d6efd';
-            const second = design.canvas.colors.secondary || first;
+        } else if (primaryColor || secondaryColor) {
+            const first = primaryColor || '#0d6efd';
+            const second = secondaryColor || first;
             area.style.backgroundImage = `linear-gradient(135deg, ${first}, ${second})`;
         }
 
@@ -588,17 +646,22 @@
         return result;
     };
 
-    const mergeElement = (baseElement = null, nextElement = null) => {
-        if (!isPlainObject(nextElement)) {
-            return baseElement || null;
-        }
-
-        if (!isPlainObject(baseElement)) {
-            return nextElement;
-        }
-
-        return mergeObject(baseElement, nextElement);
-    };
+    const collectCanvasSnapshotFallback = () => ({
+        design: null,
+        canvas: {
+            width: 0,
+            height: 0,
+            colors: {
+                primary: document.getElementById('colorPrimario')?.value || null,
+                secondary: document.getElementById('colorSecundario')?.value || null,
+            },
+            backgroundType: document.getElementById('backgroundTypeColor')?.checked ? 'color' : (document.getElementById('backgroundTypeImage')?.checked ? 'image' : null),
+            backgroundImage: document.getElementById('backgroundImageInput')?.value || null,
+        },
+        elements: [],
+        backgroundType: null,
+        backgroundImage: null,
+    });
 
     const normalizeCanvasDesign = (design, snapshot) => {
         if (!isPlainObject(design)) {
@@ -610,55 +673,30 @@
         }
 
         const baseSnapshot = isPlainObject(snapshot) ? snapshot : {};
-        const normalizedDesign = mergeObject(baseSnapshot, design);
+        const designMeta = isPlainObject(design.design) ? design.design : {};
+        const elements = Array.isArray(design.designElements)
+            ? design.designElements
+            : (Array.isArray(design.elements) ? design.elements : (Array.isArray(baseSnapshot.elements) ? baseSnapshot.elements : []));
+        const normalizedDesign = {
+            id: design.id ?? baseSnapshot.id ?? null,
+            name_usar_medida: design.name_usar_medida ?? baseSnapshot.name_usar_medida ?? null,
+            token: design.token ?? baseSnapshot.token ?? null,
+            url: design.url ?? baseSnapshot.url ?? null,
+            backgroundType: design.backgroundType ?? baseSnapshot.backgroundType ?? null,
+            borderStyle: design.borderStyle ?? designMeta.borde ?? baseSnapshot.borderStyle ?? null,
+            canvasSize: design.canvasSize ?? designMeta.lienzo ?? baseSnapshot.canvasSize ?? null,
+            nombreCampana: design.nombreCampana ?? baseSnapshot.nombreCampana ?? null,
+            primaryColor: design.primaryColor ?? designMeta.fondo ?? baseSnapshot.primaryColor ?? design.canvas?.colors?.primary ?? null,
+            secondaryColor: design.secondaryColor ?? designMeta.acento ?? baseSnapshot.secondaryColor ?? design.canvas?.colors?.secondary ?? null,
+            designElements: elements,
+            backgroundImage: design.backgroundImage ?? baseSnapshot.backgroundImage ?? null,
+            fotoMostrar: design.fotoMostrar ?? baseSnapshot.fotoMostrar ?? null,
+        };
 
-        normalizedDesign.canvas = isPlainObject(design.canvas)
-            ? mergeObject(baseSnapshot.canvas || {}, design.canvas)
-            : (baseSnapshot.canvas || design.canvas || {});
-
-        const snapshotElements = Array.isArray(baseSnapshot.elements) ? baseSnapshot.elements : [];
-        const nextElements = Array.isArray(design.elements) ? design.elements : [];
-        const hasNewElements = nextElements.length > 0;
-        normalizedDesign.elements = hasNewElements
-            ? nextElements.map((element, index) => mergeElement(snapshotElements[index] || snapshotElements.find((candidate) => candidate?.id && candidate.id === element?.id) || null, element))
-            : snapshotElements;
-
-        normalizedDesign.context = isPlainObject(design.context)
-            ? mergeObject(baseSnapshot.context || {}, design.context)
-            : (baseSnapshot.context || design.context || {});
-
-        normalizedDesign.metadata = isPlainObject(design.metadata)
-            ? mergeObject(baseSnapshot.metadata || {}, design.metadata)
-            : (baseSnapshot.metadata || design.metadata || {});
-
-        if (!isPlainObject(normalizedDesign.canvas)) {
+        if (!Array.isArray(normalizedDesign.designElements)) {
             return {
                 valid: false,
-                reason: 'El design recibido debe incluir canvas como objeto.',
-                design: null,
-            };
-        }
-
-        if (!Array.isArray(normalizedDesign.elements)) {
-            return {
-                valid: false,
-                reason: 'El design recibido debe incluir elements como lista.',
-                design: null,
-            };
-        }
-
-        if (!isPlainObject(normalizedDesign.context)) {
-            return {
-                valid: false,
-                reason: 'El design recibido debe incluir context como objeto.',
-                design: null,
-            };
-        }
-
-        if (!isPlainObject(normalizedDesign.metadata)) {
-            return {
-                valid: false,
-                reason: 'El design recibido debe incluir metadata como objeto.',
+                reason: 'El design recibido debe incluir designElements como lista.',
                 design: null,
             };
         }
@@ -680,16 +718,19 @@
             return window.__asistenteCamvasiaBuildPayload(message, conversationHistory);
         }
 
+        const snapshot = typeof window.__asistenteCamvasiaCollectCanvasSnapshot === 'function'
+            ? window.__asistenteCamvasiaCollectCanvasSnapshot()
+            : collectCanvasSnapshotFallback();
+
         return {
             message,
             tenant: widget.dataset.tenant || 'marketing',
             locale: ui.locale,
-            mode: 'generate',
-            canvas: {
-                source: 'widget',
-                widget: 'asistente-camvas-ia',
-            },
-            elements: [],
+            mode: 'restore',
+            design: snapshot,
+            canvas: snapshot.canvas,
+            elements: snapshot.elements,
+            snapshot,
             context: {
                 origin: 'marketing',
                 bubble: true,
@@ -699,9 +740,24 @@
             metadata: {
                 source: 'asistente-camvas-ia-widget',
                 requestedAt: new Date().toISOString(),
+                contract: 'canvas.restore.v1',
             },
             history: conversationHistory.slice(-8),
         };
+    };
+
+    const applyAssistantPayloadToCanvas = (payload, snapshot) => {
+        const applyBridge = window.__asistenteCamvasiaApplyPayload;
+        if (typeof applyBridge === 'function') {
+            return Boolean(applyBridge(payload, snapshot));
+        }
+
+        const validation = normalizeCanvasDesign(payload, snapshot);
+        if (!validation.valid) {
+            return false;
+        }
+
+        return applyDesignToCanvas(validation.design);
     };
 
     const extractAssistantText = (payload) => {
@@ -773,10 +829,15 @@
         }
 
         const endpoint = form.dataset.generateEndpoint;
-        const message = String(messageInput.value || '').trim() || ui.defaultMessage;
+        const message = String(messageInput.value || '').trim();
 
         if (!endpoint) {
             addMessage('assistant', ui.noEndpoint);
+            return;
+        }
+
+        if (!message) {
+            messageInput.focus();
             return;
         }
 
@@ -784,8 +845,8 @@
         conversationHistory.push({ role: 'user', content: message });
         messageInput.value = '';
         setTypingState(true);
+        showPendingState();
 
-        const pending = addMessage('assistant', ui.typing, { isPending: true });
         const requestPayload = buildTestPayload(message);
 
         try {
@@ -799,13 +860,10 @@
             });
 
             const payload = await response.json().catch(() => null);
+            clearPendingState();
             const assistantText = response.ok
                 ? extractAssistantText(payload) || ui.responseReceived
                 : normalizeText(payload, `Error HTTP ${response.status}`);
-
-            if (pending) {
-                pending.remove();
-            }
 
             addMessage(response.ok ? 'assistant' : 'assistant', assistantText);
             conversationHistory.push({ role: 'assistant', content: assistantText });
@@ -815,7 +873,7 @@
             if (response.ok && designPayload) {
                 const validation = normalizeCanvasDesign(designPayload, requestPayload.snapshot);
                 if (validation.valid) {
-                    const applied = applyDesignToCanvas(validation.design);
+                    const applied = applyAssistantPayloadToCanvas(validation.design, requestPayload.snapshot);
                     if (applied) {
                         addMessage('assistant', ui.designApplied);
                         conversationHistory.push({ role: 'assistant', content: ui.designApplied });
@@ -826,30 +884,14 @@
                 }
             }
         } catch (error) {
-            if (pending) {
-                pending.remove();
-            }
-
-            const errorText = `No fue posible enviar la prueba: ${error instanceof Error ? error.message : String(error)}`;
+            clearPendingState();
+            const errorText = `${ui.sendFailed}: ${error instanceof Error ? error.message : String(error)}`;
             addMessage('assistant', errorText);
             conversationHistory.push({ role: 'assistant', content: errorText });
         } finally {
+            clearPendingState();
             setTypingState(false);
             scrollMessagesToBottom();
-        }
-    };
-
-    const seedConversation = () => {
-        const welcome = widget.dataset.widgetMessage || ui.welcome;
-        const help = widget.dataset.widgetHelp || ui.help;
-        const connected = widget.dataset.widgetStatus === 'connected';
-
-        addMessage('assistant', welcome);
-        if (help) {
-            addMessage('assistant', help);
-        }
-        if (!connected) {
-            addMessage('assistant', widget.dataset.widgetStatusMessage || ui.disconnected);
         }
     };
 
@@ -894,5 +936,4 @@
         }
     });
 
-    seedConversation();
 })();

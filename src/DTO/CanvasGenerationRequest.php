@@ -11,12 +11,14 @@ final class CanvasGenerationRequest
      * @param array<int, array<string, mixed>> $elements
      * @param array<string, mixed> $context
      * @param array<string, mixed> $metadata
+     * @param array<string, mixed> $design
      */
     public function __construct(
         public readonly string $message,
         public readonly string $tenant,
         public readonly string $locale,
         public readonly string $mode,
+        public readonly array $design,
         public readonly array $canvas,
         public readonly array $elements,
         public readonly array $context,
@@ -31,6 +33,7 @@ final class CanvasGenerationRequest
             tenant: trim((string) ($payload['tenant'] ?? $tenantFallback)),
             locale: self::normalizeLocale($payload['locale'] ?? 'es'),
             mode: trim((string) ($payload['mode'] ?? 'generate')),
+            design: is_array($payload['design'] ?? null) ? $payload['design'] : [],
             canvas: is_array($payload['canvas'] ?? null) ? $payload['canvas'] : [],
             elements: is_array($payload['elements'] ?? null) ? $payload['elements'] : [],
             context: is_array($payload['context'] ?? null) ? $payload['context'] : [],
@@ -48,6 +51,7 @@ final class CanvasGenerationRequest
             'tenant' => $this->tenant,
             'locale' => $this->locale,
             'mode' => $this->mode,
+            'design' => $this->design,
             'canvas' => $this->canvas,
             'elements' => $this->elements,
             'context' => $this->context,

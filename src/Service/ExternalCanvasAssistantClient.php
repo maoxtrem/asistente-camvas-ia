@@ -41,7 +41,7 @@ final class ExternalCanvasAssistantClient
 
             $payload = $response->toArray(false);
         } catch (Throwable $exception) {
-            $copy = LocaleCopy::service($this->locale);
+            $copy = LocaleCopy::service($request->locale);
 
             return new CanvasGenerationResponse(
                 ok: false,
@@ -59,7 +59,7 @@ final class ExternalCanvasAssistantClient
 
         return new CanvasGenerationResponse(
             ok: true,
-            message: $message !== '' ? $message : LocaleCopy::service($this->locale)['generation_unavailable'],
+            message: $message !== '' ? $message : LocaleCopy::service($request->locale)['generation_unavailable'],
             design: $design,
             actions: $actions,
             raw: is_array($payload) ? $payload : [],
@@ -69,8 +69,10 @@ final class ExternalCanvasAssistantClient
     /**
      * @return array{ok:bool, message:string, status_code:?int, raw:array<string, mixed>}
      */
-    public function health(): array
+    public function health(?string $locale = null): array
     {
+        $resolvedLocale = $locale !== null && trim($locale) !== '' ? $locale : $this->locale;
+
         try {
             $response = $this->httpClient->request('GET', $this->buildHealthUrl(), [
                 'headers' => $this->buildHeaders(),
@@ -86,12 +88,12 @@ final class ExternalCanvasAssistantClient
 
             return [
                 'ok' => $statusCode >= 200 && $statusCode < 300,
-                'message' => $message !== '' ? $message : 'Conexión disponible con el microservicio.',
+                'message' => $message !== '' ? $message : LocaleCopy::service($resolvedLocale)['connection_available'],
                 'status_code' => $statusCode,
                 'raw' => is_array($payload) ? $payload : [],
             ];
         } catch (Throwable $exception) {
-            $copy = LocaleCopy::service($this->locale);
+            $copy = LocaleCopy::service($resolvedLocale);
 
             return [
                 'ok' => false,

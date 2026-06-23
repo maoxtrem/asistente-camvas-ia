@@ -4,10 +4,6 @@
     data-widget-locale="{{ locale|e('html_attr') }}"
     data-widget-title="{{ widgetTitle|e('html_attr') }}"
     data-widget-label="{{ widgetLabel|e('html_attr') }}"
-    data-widget-message="{{ widgetMessage|e('html_attr') }}"
-    data-widget-help="{{ widgetHelpText|e('html_attr') }}"
-    data-widget-status="{{ connection.ok ? 'connected' : 'offline' }}"
-    data-widget-status-message="{{ connection.message|e('html_attr') }}"
     data-tenant="{{ tenantName|e('html_attr') }}"
     data-ui-close-label="{{ ui.close_label|e('html_attr') }}"
     data-ui-status-connected="{{ ui.status_connected|e('html_attr') }}"
@@ -18,14 +14,10 @@
     data-ui-sending-label="{{ ui.sending_label|e('html_attr') }}"
     data-ui-user-label="{{ ui.user_label|e('html_attr') }}"
     data-ui-assistant-label="{{ ui.assistant_label|e('html_attr') }}"
-    data-ui-welcome="{{ ui.welcome|e('html_attr') }}"
-    data-ui-help="{{ ui.help|e('html_attr') }}"
-    data-ui-disconnected="{{ ui.disconnected|e('html_attr') }}"
     data-ui-no-endpoint="{{ ui.no_endpoint|e('html_attr') }}"
     data-ui-response-received="{{ ui.response_received|e('html_attr') }}"
     data-ui-design-applied="{{ ui.design_applied|e('html_attr') }}"
-    data-ui-typing="{{ ui.typing|e('html_attr') }}"
-    data-ui-default-message="{{ ui.default_message|e('html_attr') }}"
+    data-ui-send-failed="{{ ui.send_failed|e('html_attr') }}"
 >
     <section id="asistentecamvasia-panel" class="asistentecamvasia-panel" aria-hidden="true">
         <header class="asistentecamvasia-panel__header">
@@ -35,16 +27,19 @@
 
         <div class="asistentecamvasia-panel__body">
             <div class="asistentecamvasia-status asistentecamvasia-status--{{ connection.ok ? 'ok' : 'error' }}">
-                <span class="asistentecamvasia-status__badge">
-                    {{ connection.ok ? ui.status_connected : ui.status_offline }}
+                <span
+                    class="asistentecamvasia-status__dot"
+                    title="{{ connection.ok ? ui.status_connected : ui.status_offline }}"
+                    aria-label="{{ connection.ok ? ui.status_connected : ui.status_offline }}"
+                >
+                    <span class="visually-hidden">
+                        {{ connection.ok ? ui.status_connected : ui.status_offline }}
+                    </span>
                 </span>
-                <p class="asistentecamvasia-status__message">{{ widgetMessage }}</p>
-                <p class="asistentecamvasia-status__help">{{ widgetHelpText }}</p>
-                <small class="asistentecamvasia-status__detail">{{ connection.message }}</small>
             </div>
 
             <div id="asistentecamvasia-chat" class="asistentecamvasia-chat">
-                <div id="asistentecamvasia-messages" class="asistentecamvasia-chat__messages" aria-live="polite" aria-label="Historial del chat"></div>
+                <div id="asistentecamvasia-messages" class="asistentecamvasia-chat__messages" aria-live="polite" aria-label="{{ ui.chat_history_label|e('html_attr') }}"></div>
 
                 <form
                     id="asistentecamvasia-form"
@@ -59,7 +54,7 @@
                         class="asistentecamvasia-chat__input"
                         rows="3"
                         placeholder="{{ ui.placeholder|e('html_attr') }}"
-                    >{{ ui.default_message }}</textarea>
+                    ></textarea>
 
                     <div class="asistentecamvasia-chat__actions">
                         <button id="asistentecamvasia-send" type="submit" class="asistentecamvasia-chat__send">
