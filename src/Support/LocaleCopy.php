@@ -39,7 +39,7 @@ final class LocaleCopy
             'default_message' => 'Connection test from the Canvas AI bubble.',
             'send_failed' => 'Could not send the test',
             'invalid_json' => 'The body must be valid JSON.',
-            'message_required' => 'The message field is required.',
+            'question_required' => 'The question field is required.',
         ] : [
             'widget_title' => 'Asistente Canvas IA',
             'widget_label' => 'Canvas IA',
@@ -65,7 +65,7 @@ final class LocaleCopy
             'default_message' => 'Prueba de conexión desde la burbuja de Canvas IA.',
             'send_failed' => 'No fue posible enviar la prueba',
             'invalid_json' => 'El cuerpo debe ser JSON valido.',
-            'message_required' => 'El campo message es obligatorio.',
+            'question_required' => 'El campo question es obligatorio.',
         ];
     }
 

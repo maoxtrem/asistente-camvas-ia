@@ -15,7 +15,6 @@ services:
 
   Maoxtrem\AsistenteCamvasia\Controller\Api\CanvasGenerationController:
     arguments:
-      $tenantName: '%asistentecamvasia.tenant_name%'
       $locale: '%asistentecamvasia.locale%'
 
   Maoxtrem\AsistenteCamvasia\Service\ExternalCanvasAssistantClient:

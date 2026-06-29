@@ -17,7 +17,6 @@ final class CanvasGenerationController
     public function __construct(
         private readonly ExternalCanvasAssistantClient $canvasAssistantClient,
         private readonly RequestStack $requestStack,
-        private readonly string $tenantName,
         private readonly string $locale,
     ) {
     }
@@ -38,15 +37,14 @@ final class CanvasGenerationController
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $payload['tenant'] = trim((string) ($payload['tenant'] ?? $this->tenantName));
-        $generationRequest = CanvasGenerationRequest::fromArray($payload, $this->tenantName);
+        $generationRequest = CanvasGenerationRequest::fromArray($payload);
 
-        if ($generationRequest->message === '') {
+        if ($generationRequest->question === '') {
             return new JsonResponse([
                 'ok' => false,
                 'error' => [
-                    'code' => 'message_required',
-                    'message' => LocaleCopy::widget($locale)['message_required'],
+                    'code' => 'question_required',
+                    'message' => LocaleCopy::widget($locale)['question_required'],
                 ],
             ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
