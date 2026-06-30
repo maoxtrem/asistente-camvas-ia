@@ -60,13 +60,11 @@
         }
 
         if (value && typeof value === 'object') {
-            if (typeof value.message === 'string' && value.message.trim() !== '') {
-                return value.message.trim();
-            }
-
-            if (typeof value.error?.message === 'string' && value.error.message.trim() !== '') {
-                return value.error.message.trim();
-            }
+            const msg = value.message?.trim();
+            if (msg) return msg;
+            
+            const errMsg = value.error?.message?.trim();
+            if (errMsg) return errMsg;
         }
 
         return fallback;
@@ -222,16 +220,14 @@
             });
 
             const payload = await response.json().catch(() => null);
-            clearPendingState();
             const assistantText = response.ok
                 ? extractAssistantText(payload) || ui.responseReceived
                 : normalizeText(payload, `Error HTTP ${response.status}`);
 
-            addMessage(response.ok ? 'assistant' : 'assistant', assistantText);
+            addMessage('assistant', assistantText);
             conversationHistory.push({ role: 'assistant', content: assistantText });
 
         } catch (error) {
-            clearPendingState();
             const errorText = `${ui.sendFailed}: ${error instanceof Error ? error.message : String(error)}`;
             addMessage('assistant', errorText);
             conversationHistory.push({ role: 'assistant', content: errorText });
@@ -256,20 +252,10 @@
         void sendQuestion();
     });
 
-    messageInput?.addEventListener('keydown', (event) => {
-        if (event.key !== 'Enter' || event.shiftKey) {
-            return;
-        }
-
-        event.preventDefault();
-        void sendQuestion();
-    });
-
     window.addEventListener('asistente-camvas-ia:open', () => setOpen(true));
     window.addEventListener('asistente-camvas-ia:close', () => setOpen(false));
     window.addEventListener('asistente-camvas-ia:toggle', (event) => {
-        const open = event?.detail?.open;
-        setOpen(typeof open === 'boolean' ? open : !panel.classList.contains('is-open'));
+        toggle(event?.detail?.open);
     });
 
     document.addEventListener('click', (event) => {
@@ -283,5 +269,19 @@
             setOpen(false);
         }
     });
+
+    const DEFAULT_GENERATED_IMAGE_URL = 'https://asistente-ia-api.localhost/api/v1/asistentecamvasia/canvas/image?key=canvas/marketing/es/95669392f7e307e4.png';
+
+    const cargarImagenGeneradaPorIa = (agregarImagenFn, url = DEFAULT_GENERATED_IMAGE_URL) => {
+        if (typeof agregarImagenFn !== 'function') {
+            console.warn('[asistentecamvasia-widget] agregarImagenFn no es una funcion');
+            return false;
+        }
+
+        agregarImagenFn(url);
+        return true;
+    };
+
+    window.__cargarImagenGeneradaPorIa = cargarImagenGeneradaPorIa;
 
 })();
