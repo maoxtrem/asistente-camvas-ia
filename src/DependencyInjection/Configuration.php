@@ -17,6 +17,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('base_url')->defaultValue('http://host.docker.internal:8001')->end()
                 ->scalarNode('generation_endpoint')->defaultValue('/api/v1/asistentecamvasia/canvas/generate')->end()
+                ->scalarNode('images_endpoint')->defaultValue('/api/v1/asistentecamvasia/canvas/images')->end()
                 ->scalarNode('health_endpoint')->defaultValue('/api/health')->end()
                 ->scalarNode('tenant_name')->defaultValue('marketing')->end()
                 ->scalarNode('locale')->defaultValue('es')->end()

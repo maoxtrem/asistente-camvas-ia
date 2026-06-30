@@ -18,6 +18,7 @@ final class AsistenteCamvasiaExtension extends Extension
 
         $container->setParameter('asistentecamvasia.base_url', $config['base_url']);
         $container->setParameter('asistentecamvasia.generation_endpoint', $config['generation_endpoint']);
+        $container->setParameter('asistentecamvasia.images_endpoint', $config['images_endpoint']);
         $container->setParameter('asistentecamvasia.health_endpoint', $config['health_endpoint']);
         $container->setParameter('asistentecamvasia.tenant_name', $config['tenant_name']);
         $container->setParameter('asistentecamvasia.locale', $config['locale']);

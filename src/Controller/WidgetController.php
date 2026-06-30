@@ -21,6 +21,7 @@ final class WidgetController
         private readonly string $locale,
         private readonly string $widgetTitle,
         private readonly string $widgetLabel,
+        private readonly string $imagesEndpoint,
     ) {
     }
 
@@ -38,6 +39,7 @@ final class WidgetController
             'widgetTitle' => $widgetTitle,
             'widgetLabel' => $widgetLabel,
             'connection' => $this->canvasAssistantClient->health($locale),
+            'imagesEndpoint' => $this->imagesEndpoint,
             'ui' => $ui,
         ]));
     }

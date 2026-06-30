@@ -16,6 +16,7 @@ final class ExternalCanvasAssistantClient
         private readonly HttpClientInterface $httpClient,
         private readonly string $baseUrl,
         private readonly string $generationEndpoint,
+        private readonly string $imagesEndpoint,
         private readonly string $healthEndpoint,
         private readonly string $apiKey,
         private readonly float $connectTimeout,
@@ -104,14 +105,63 @@ final class ExternalCanvasAssistantClient
         }
     }
 
+    /**
+     * @return array{ok:bool, status_code:int, message:string, payload:array<string, mixed>}
+     */
+    public function images(array $query = []): array
+    {
+        try {
+            $response = $this->httpClient->request('GET', $this->buildImagesUrl(), [
+                'headers' => $this->buildHeaders(),
+                'query' => $query,
+                'max_connect_duration' => $this->connectTimeout,
+                'timeout' => $this->timeout,
+                'verify_peer' => $this->verifyPeer,
+                'verify_host' => $this->verifyHost,
+            ]);
+
+            $payload = $response->toArray(false);
+            $statusCode = $response->getStatusCode();
+            $message = trim((string) ($payload['message'] ?? $payload['status'] ?? ''));
+
+            return [
+                'ok' => $statusCode >= 200 && $statusCode < 300,
+                'status_code' => $statusCode,
+                'message' => $message,
+                'payload' => is_array($payload) ? $payload : [],
+            ];
+        } catch (Throwable $exception) {
+            return [
+                'ok' => false,
+                'status_code' => 502,
+                'message' => LocaleCopy::service($this->locale)['connection_failed'],
+                'payload' => [],
+            ];
+        }
+    }
+
     private function buildUrl(): string
     {
-        return rtrim($this->baseUrl, '/') . '/' . ltrim($this->generationEndpoint, '/');
+        return $this->buildAbsoluteUrl($this->generationEndpoint);
+    }
+
+    private function buildImagesUrl(): string
+    {
+        return $this->buildAbsoluteUrl($this->imagesEndpoint);
     }
 
     private function buildHealthUrl(): string
     {
-        return rtrim($this->baseUrl, '/') . '/' . ltrim($this->healthEndpoint, '/');
+        return $this->buildAbsoluteUrl($this->healthEndpoint);
+    }
+
+    private function buildAbsoluteUrl(string $endpoint): string
+    {
+        if (preg_match('#^https?://#i', $endpoint) === 1) {
+            return $endpoint;
+        }
+
+        return rtrim($this->baseUrl, '/') . '/' . ltrim($endpoint, '/');
     }
 
     /**

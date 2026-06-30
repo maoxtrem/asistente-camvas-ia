@@ -8,6 +8,7 @@ final class CanvasGenerationRequest
 {
     public function __construct(
         public readonly string $question,
+        public readonly string $locale = 'es',
     ) {
     }
 
@@ -15,6 +16,7 @@ final class CanvasGenerationRequest
     {
         return new self(
             question: trim((string) ($payload['question'] ?? $payload['message'] ?? '')),
+            locale: trim((string) ($payload['locale'] ?? $payload['lang'] ?? 'es')) ?: 'es',
         );
     }
 
@@ -25,6 +27,7 @@ final class CanvasGenerationRequest
     {
         return [
             'question' => $this->question,
+            'locale' => $this->locale,
         ];
     }
 }

@@ -5,6 +5,7 @@
     data-widget-title="{{ widgetTitle|e('html_attr') }}"
     data-widget-label="{{ widgetLabel|e('html_attr') }}"
     data-tenant="{{ tenantName|e('html_attr') }}"
+    data-images-endpoint="{{ imagesEndpoint|e('html_attr') }}"
     data-ui-close-label="{{ ui.close_label|e('html_attr') }}"
     data-ui-status-connected="{{ ui.status_connected|e('html_attr') }}"
     data-ui-status-offline="{{ ui.status_offline|e('html_attr') }}"
@@ -38,6 +39,16 @@
                 </span>
             </div>
 
+            <section class="asistentecamvasia-gallery" aria-label="Galeria de imagenes">
+                <div class="asistentecamvasia-gallery__header">
+                    <strong>Imagenes creadas</strong>
+                    <small class="asistentecamvasia-gallery__hint">Pulsa una miniatura para insertarla en el lienzo</small>
+                </div>
+                <div id="asistentecamvasia-gallery" class="asistentecamvasia-gallery__grid" aria-live="polite">
+                    <p class="asistentecamvasia-gallery__empty">Cargando imagenes...</p>
+                </div>
+            </section>
+
             <div id="asistentecamvasia-chat" class="asistentecamvasia-chat">
                 <div id="asistentecamvasia-messages" class="asistentecamvasia-chat__messages" aria-live="polite" aria-label="{{ ui.chat_history_label|e('html_attr') }}"></div>
 
@@ -69,4 +80,4 @@
 
 <link rel="stylesheet" href="{{ asset('bundles/asistentecamvasia/css/asistente-camvasia-widget.css') }}">
 <script defer src="{{ asset('bundles/asistentecamvasia/js/asistente-camvas-ia.js') }}"></script>
-<script defer src="{{ asset('bundles/asistentecamvasia/js/asistente-camvasia-widget.js') }}"></script>
+<script type="module" src="{{ asset('bundles/asistentecamvasia/js/main.js') }}"></script>

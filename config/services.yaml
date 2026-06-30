@@ -21,6 +21,7 @@ services:
     arguments:
       $baseUrl: '%asistentecamvasia.base_url%'
       $generationEndpoint: '%asistentecamvasia.generation_endpoint%'
+      $imagesEndpoint: '%asistentecamvasia.images_endpoint%'
       $healthEndpoint: '%asistentecamvasia.health_endpoint%'
       $apiKey: '%asistentecamvasia.api_key%'
       $connectTimeout: '%asistentecamvasia.connect_timeout%'
@@ -36,3 +37,4 @@ services:
       $locale: '%asistentecamvasia.locale%'
       $widgetTitle: '%asistentecamvasia.widget_title%'
       $widgetLabel: '%asistentecamvasia.widget_label%'
+      $imagesEndpoint: '%asistentecamvasia.images_endpoint%'
