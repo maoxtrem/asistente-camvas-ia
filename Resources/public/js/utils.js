@@ -47,16 +47,24 @@ export const normalizeGalleryUrl = (value) => {
         return normalizeGalleryUrl(
             value.url ||
             value.image ||
+            value.image_url ||
             value.path ||
             value.src ||
             value.imageUrl ||
+            value.public_url ||
             value.publicUrl ||
+            value.file_url ||
             value.fileUrl ||
             value.data?.url ||
             value.data?.image ||
+            value.data?.image_url ||
             value.data?.path ||
             value.data?.src ||
-            value.data?.imageUrl
+            value.data?.imageUrl ||
+            value.data?.public_url ||
+            value.data?.publicUrl ||
+            value.data?.file_url ||
+            value.data?.fileUrl
         );
     }
 
@@ -73,8 +81,11 @@ export const extractGalleryItems = (payload) => {
             payload.images,
             payload.data,
             payload.items,
+            payload.records,
             payload.results,
             payload.gallery,
+            payload.body?.records,
+            payload.data?.records,
         ];
 
         for (const candidate of candidates) {

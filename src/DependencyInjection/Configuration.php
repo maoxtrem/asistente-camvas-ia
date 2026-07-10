@@ -20,6 +20,8 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('images_endpoint')->defaultValue('/api/v1/asistentecamvasia/canvas/images')->end()
                 ->scalarNode('health_endpoint')->defaultValue('/api/health')->end()
                 ->scalarNode('tenant_name')->defaultValue('marketing')->end()
+                ->scalarNode('canvas_environment')->defaultValue('dev')->end()
+                ->integerNode('images_limit')->defaultValue(10)->min(1)->end()
                 ->scalarNode('locale')->defaultValue('es')->end()
                 ->scalarNode('api_key')->defaultValue('')->end()
                 ->floatNode('connect_timeout')->defaultValue(10.0)->end()

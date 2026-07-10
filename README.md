@@ -23,7 +23,9 @@ asistentecamvasia:
   base_url: 'http://host.docker.internal:8001'
   generation_endpoint: '/api/v1/asistentecamvasia/canvas/generate'
   health_endpoint: '/api/health'
-  tenant_name: 'marketing'
+  tenant_name: '%env(ASISTENTECAMVASIA_TENANT_NAME)%'
+  canvas_environment: '%env(default:dev:ASISTENTECAMVASIA_CANVAS_ENVIRONMENT)%'
+  images_limit: 10
   locale: 'es'
   api_key: '%env(ASISTENTECAMVASIA_API_KEY)%'
   widget_title: 'Asistente Canvas IA'
@@ -32,4 +34,5 @@ asistentecamvasia:
   widget_help_text: 'Listo para preparar el lienzo cuando lo necesites.'
 ```
 
+El `usuario` se toma del usuario autenticado en la aplicación anfitriona.
 Si no defines `widget_title`, `widget_label`, `widget_message` o `widget_help_text`, el bundle usa los textos por defecto del `locale` configurado.

@@ -108,12 +108,12 @@ final class ExternalCanvasAssistantClient
     /**
      * @return array{ok:bool, status_code:int, message:string, payload:array<string, mixed>}
      */
-    public function images(array $query = []): array
+    public function images(array $payload = []): array
     {
         try {
-            $response = $this->httpClient->request('GET', $this->buildImagesUrl(), [
+            $response = $this->httpClient->request('POST', $this->buildImagesUrl(), [
                 'headers' => $this->buildHeaders(),
-                'query' => $query,
+                'json' => $payload,
                 'max_connect_duration' => $this->connectTimeout,
                 'timeout' => $this->timeout,
                 'verify_peer' => $this->verifyPeer,

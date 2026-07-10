@@ -7,16 +7,22 @@ namespace Maoxtrem\AsistenteCamvasia\DTO;
 final class CanvasGenerationRequest
 {
     public function __construct(
-        public readonly string $question,
+        public readonly string $message,
+        public readonly string $tenant,
+        public readonly string $usuario,
         public readonly string $locale = 'es',
+        public readonly array $metadata = [],
     ) {
     }
 
-    public static function fromArray(array $payload): self
+    public static function fromArray(array $payload, string $tenantFallback = 'marketing', string $usuarioFallback = ''): self
     {
         return new self(
-            question: trim((string) ($payload['question'] ?? $payload['message'] ?? '')),
-            locale: trim((string) ($payload['locale'] ?? $payload['lang'] ?? 'es')) ?: 'es',
+            message: trim((string) ($payload['message'] ?? $payload['question'] ?? '')),
+            tenant: self::resolveValue($payload['tenant'] ?? null, $tenantFallback),
+            usuario: self::resolveValue($payload['usuario'] ?? null, $usuarioFallback),
+            locale: self::resolveValue($payload['locale'] ?? $payload['lang'] ?? null, 'es'),
+            metadata: is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [],
         );
     }
 
@@ -26,8 +32,18 @@ final class CanvasGenerationRequest
     public function toArray(): array
     {
         return [
-            'question' => $this->question,
+            'message' => $this->message,
+            'tenant' => $this->tenant,
+            'usuario' => $this->usuario,
             'locale' => $this->locale,
+            'metadata' => $this->metadata,
         ];
+    }
+
+    private static function resolveValue(mixed $value, string $fallback): string
+    {
+        $normalized = trim((string) ($value ?? ''));
+
+        return $normalized !== '' ? $normalized : $fallback;
     }
 }

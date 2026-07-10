@@ -1,11 +1,15 @@
-export const fetchGallery = async (endpoint) => {
+export const fetchGallery = async (endpoint, payload = {}) => {
     const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' },
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
     });
 
-    const payload = await response.json().catch(() => null);
-    return { response, payload };
+    const responsePayload = await response.json().catch(() => null);
+    return { response, payload: responsePayload };
 };
 
 export const sendQuestionRequest = async (endpoint, payload) => {

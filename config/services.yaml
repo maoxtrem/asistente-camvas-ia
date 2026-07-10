@@ -16,6 +16,13 @@ services:
   Maoxtrem\AsistenteCamvasia\Controller\Api\CanvasGenerationController:
     arguments:
       $locale: '%asistentecamvasia.locale%'
+      $tenantName: '%asistentecamvasia.tenant_name%'
+
+  Maoxtrem\AsistenteCamvasia\Controller\Api\CanvasImagesController:
+    arguments:
+      $tenantName: '%asistentecamvasia.tenant_name%'
+      $canvasEnvironment: '%asistentecamvasia.canvas_environment%'
+      $imagesLimit: '%asistentecamvasia.images_limit%'
 
   Maoxtrem\AsistenteCamvasia\Service\ExternalCanvasAssistantClient:
     arguments:
@@ -34,6 +41,8 @@ services:
   Maoxtrem\AsistenteCamvasia\Controller\WidgetController:
     arguments:
       $tenantName: '%asistentecamvasia.tenant_name%'
+      $canvasEnvironment: '%asistentecamvasia.canvas_environment%'
+      $imagesLimit: '%asistentecamvasia.images_limit%'
       $locale: '%asistentecamvasia.locale%'
       $widgetTitle: '%asistentecamvasia.widget_title%'
       $widgetLabel: '%asistentecamvasia.widget_label%'

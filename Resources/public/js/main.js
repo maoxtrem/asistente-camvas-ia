@@ -35,6 +35,9 @@ import { extractGalleryItems, normalizeText } from './utils.js';
     const ui = readUiTexts(widget);
     const conversationHistory = [];
     const tenant = widget.dataset.tenant || 'marketing';
+    const usuario = widget.dataset.usuario || '';
+    const entorno = widget.dataset.entorno || 'dev';
+    const imagesLimit = Number.parseInt(widget.dataset.imagesLimit || '10', 10);
 
     const cargarImagenGeneradaPorIa = (agregarImagenFn, url) => {
         if (typeof agregarImagenFn !== 'function') {
@@ -76,7 +79,12 @@ import { extractGalleryItems, normalizeText } from './utils.js';
         galleryBox.innerHTML = '<p class="asistentecamvasia-gallery__empty">Cargando imagenes...</p>';
 
         try {
-            const { response, payload } = await fetchGallery(endpoint);
+            const { response, payload } = await fetchGallery(endpoint, {
+                tenant,
+                usuario,
+                entorno,
+                limit: Number.isFinite(imagesLimit) && imagesLimit > 0 ? imagesLimit : 10,
+            });
             if (!response.ok) {
                 throw new Error(normalizeText(payload, `Error HTTP ${response.status}`));
             }
@@ -185,9 +193,14 @@ import { extractGalleryItems, normalizeText } from './utils.js';
 
         try {
             const { response, payload } = await sendQuestionRequest(endpoint, {
+                message,
                 question: message,
                 tenant,
+                usuario,
                 locale: ui.locale,
+                metadata: {
+                    source: 'bundle-canvas',
+                },
             });
 
             if (response.ok) {
