@@ -37,6 +37,12 @@ final class WidgetController
         $widgetTitle = $this->widgetTitle !== '' ? $this->widgetTitle : $ui['widget_title'];
         $widgetLabel = $this->widgetLabel !== '' ? $this->widgetLabel : $ui['widget_label'];
         $usuario = $this->resolveUsuario();
+        $connection = $this->canvasAssistantClient->images([
+            'tenant' => $this->tenantName,
+            'usuario' => $usuario,
+            'entorno' => $this->canvasEnvironment,
+            'limit' => 1,
+        ]);
 
         return new Response($this->twig->render('@AsistenteCamvasia/widget/bubble.html.twig', [
             'tenantName' => $this->tenantName,
@@ -46,7 +52,7 @@ final class WidgetController
             'locale' => $locale,
             'widgetTitle' => $widgetTitle,
             'widgetLabel' => $widgetLabel,
-            'connection' => $this->canvasAssistantClient->health($locale),
+            'connection' => $connection,
             'imagesEndpoint' => $this->imagesEndpoint,
             'ui' => $ui,
         ]));
